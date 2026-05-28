@@ -172,7 +172,6 @@ function updatePendingBadge() {
   const cnt = getPending().filter(p=>p.status==="pending").length;
   const b = document.getElementById("pendingCount");
   if(b){ b.textContent=cnt; b.style.display=cnt>0?"inline-block":"none"; }
-  // Orders badge — đơn chờ xử lý
   const oCnt = getOrders().filter(o=>o.status==="pending"||o.status==="awaiting_payment").length;
   const ob = document.getElementById("ordersCount");
   if(ob){ ob.textContent=oCnt; ob.style.display=oCnt>0?"inline-block":"none"; }
@@ -873,7 +872,6 @@ function adjustStock(id, delta) {
   merch[idx].stock = Math.max(0, current + delta);
   saveMerch(merch);
   renderMerch();
-}
 }
 
 function openAddMerchModal() {
