@@ -10,6 +10,7 @@ const USERS_KEY      = "pawlink_users";
 const FOSTERS_KEY    = "pawgen_fosters";
 const VOLUNTEERS_KEY = "pawgen_volunteers";
 const MERCH_KEY      = "pawgen_merch";
+const ORDERS_KEY     = "pawgen_orders";
 
 // ===== SEED DATA =====
 const SEED_PENDING = [
@@ -51,6 +52,8 @@ function getApproved()   { try { return JSON.parse(localStorage.getItem(STORAGE_
 function getPending()    { try { const s=JSON.parse(localStorage.getItem(PENDING_KEY)||"null"); if(!s){localStorage.setItem(PENDING_KEY,JSON.stringify(SEED_PENDING));return SEED_PENDING;} return s; } catch { return SEED_PENDING; } }
 function getFosters()    { try { const s=JSON.parse(localStorage.getItem(FOSTERS_KEY)||"null"); if(!s){localStorage.setItem(FOSTERS_KEY,JSON.stringify(SEED_FOSTERS));return SEED_FOSTERS;} return s; } catch { return SEED_FOSTERS; } }
 function getVolunteers() { try { const s=JSON.parse(localStorage.getItem(VOLUNTEERS_KEY)||"null"); if(!s){localStorage.setItem(VOLUNTEERS_KEY,JSON.stringify(SEED_VOLUNTEERS));return SEED_VOLUNTEERS;} return s; } catch { return SEED_VOLUNTEERS; } }
+function getOrders()    { try { return JSON.parse(localStorage.getItem(ORDERS_KEY)||"[]"); } catch { return []; } }
+function saveOrders(d)  { localStorage.setItem(ORDERS_KEY, JSON.stringify(d)); }
 function getMerch()      { try { const s=JSON.parse(localStorage.getItem(MERCH_KEY)||"null"); if(!s){localStorage.setItem(MERCH_KEY,JSON.stringify(SEED_MERCH));return SEED_MERCH;} return s; } catch { return SEED_MERCH; } }
 function getSession()    { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } }
 
@@ -149,7 +152,7 @@ function initSidebar() {
 function navigateTo(page) {
   currentPage = page;
   document.querySelectorAll(".sidebar-link").forEach(l => l.classList.toggle("active", l.dataset.page === page));
-  const titles = { overview:"Dashboard Tổng quan", pending:"Duyệt báo cáo", approved:"Đã duyệt", rejected:"Đã từ chối", add:"Thêm thú cưng", fosters:"Người nuôi tạm", volunteers:"Tình nguyện viên", merch:"Quản lý Merch" };
+  const titles = { overview:"Dashboard Tổng quan", pending:"Duyệt báo cáo", approved:"Đã duyệt", rejected:"Đã từ chối", add:"Thêm thú cưng", fosters:"Người nuôi tạm", volunteers:"Tình nguyện viên", merch:"Quản lý Merch", orders:"Quản lý Đơn hàng" };
   document.getElementById("topbarTitle").textContent = titles[page] || page;
   pendingList = getPending(); approvedList = getApproved();
   switch(page) {
@@ -161,6 +164,7 @@ function navigateTo(page) {
     case "fosters":    renderFosters(); break;
     case "volunteers": renderVolunteers(); break;
     case "merch":      renderMerch(); break;
+    case "orders":     renderOrders(); break;
   }
 }
 
@@ -168,6 +172,10 @@ function updatePendingBadge() {
   const cnt = getPending().filter(p=>p.status==="pending").length;
   const b = document.getElementById("pendingCount");
   if(b){ b.textContent=cnt; b.style.display=cnt>0?"inline-block":"none"; }
+  // Orders badge — đơn chờ xử lý
+  const oCnt = getOrders().filter(o=>o.status==="pending"||o.status==="awaiting_payment").length;
+  const ob = document.getElementById("ordersCount");
+  if(ob){ ob.textContent=oCnt; ob.style.display=oCnt>0?"inline-block":"none"; }
 }
 
 // ===== OVERVIEW =====
@@ -666,9 +674,155 @@ function deleteVolunteer(id) {
 }
 
 // ===== FIX #3: MERCH MANAGEMENT =====
+// ===== ORDERS =====
+function renderOrders(filterStatus="all") {
+  const orders = getOrders();
+  const merch = getMerch();
+  const statusLabel = {
+    pending:          { text:"⏳ Chờ xác nhận",   cls:"sbadge-watch"    },
+    awaiting_payment: { text:"💳 Chờ thanh toán",  cls:"sbadge-watch"    },
+    confirmed:        { text:"✅ Đã xác nhận",     cls:"sbadge-approved" },
+    shipping:         { text:"🚚 Đang giao",        cls:"sbadge-approved" },
+    delivered:        { text:"📦 Đã giao",          cls:"sbadge-approved" },
+    cancelled:        { text:"❌ Đã hủy",           cls:"sbadge-rejected" },
+  };
+  const payLabel = { qr:"📱 Chuyển khoản", cod:"💵 COD" };
+
+  let filtered = orders;
+  if(filterStatus!=="all") filtered = orders.filter(o=>o.status===filterStatus);
+  filtered = [...filtered].sort((a,b)=>new Date(b.time)-new Date(a.time));
+
+  const counts = {
+    all: orders.length,
+    pending: orders.filter(o=>o.status==="pending"||o.status==="awaiting_payment").length,
+    confirmed: orders.filter(o=>o.status==="confirmed").length,
+    shipping: orders.filter(o=>o.status==="shipping").length,
+    delivered: orders.filter(o=>o.status==="delivered").length,
+    cancelled: orders.filter(o=>o.status==="cancelled").length,
+  };
+  const totalRevenue = orders.filter(o=>o.status!=="cancelled").reduce((s,o)=>s+(o.total||0),0);
+
+  document.getElementById("pageContent").innerHTML = `
+    <div class="metrics-row" style="margin-bottom:1.25rem">
+      <div class="metric-card"><div class="metric-icon">📦</div><span class="metric-val">${counts.all}</span><div class="metric-label">Tổng đơn</div></div>
+      <div class="metric-card" style="border-top-color:var(--yellow)"><div class="metric-icon">⏳</div><span class="metric-val" style="color:var(--yellow)">${counts.pending}</span><div class="metric-label">Chờ xử lý</div></div>
+      <div class="metric-card" style="border-top-color:var(--green)"><div class="metric-icon">🚚</div><span class="metric-val" style="color:var(--green)">${counts.shipping}</span><div class="metric-label">Đang giao</div></div>
+      <div class="metric-card" style="border-top-color:var(--terracotta)"><div class="metric-icon">💰</div><span class="metric-val" style="color:var(--terracotta);font-size:1rem">${formatPrice(totalRevenue)}</span><div class="metric-label">Doanh thu</div></div>
+    </div>
+
+    <div class="table-card">
+      <div class="table-header">
+        <span class="table-title">🛒 Danh sách đơn hàng</span>
+        <div style="display:flex;gap:0.4rem;flex-wrap:wrap">
+          ${[["all","Tất cả"],["pending","Chờ xử lý"],["confirmed","Đã xác nhận"],["shipping","Đang giao"],["delivered","Đã giao"],["cancelled","Đã hủy"]].map(([s,l])=>`
+            <button onclick="renderOrders('${s}')" style="padding:0.3rem 0.75rem;font-size:0.75rem;border:none;border-radius:20px;cursor:pointer;font-family:var(--font-body);
+              background:${filterStatus===s?"var(--terracotta)":"var(--cream-2)"};color:${filterStatus===s?"#fff":"var(--charcoal)"};">${l}${counts[s]!==undefined?" ("+counts[s]+")":""}</button>
+          `).join("")}
+        </div>
+      </div>
+
+      ${filtered.length===0?`<div class="empty-state"><div class="empty-state-icon">📭</div><h3>Không có đơn hàng nào</h3></div>`:`
+      <div style="overflow-x:auto"><table class="tbl">
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Thời gian</th><th>Hành động</th></tr></thead>
+        <tbody>
+          ${filtered.map(o=>{
+            const sl = statusLabel[o.status]||{text:o.status,cls:""};
+            const itemNames = (o.items||[]).map(ci=>{
+              const m = merch.find(m=>Number(m.id)===Number(ci.id));
+              return m ? `${m.emoji} ${m.name} ×${ci.qty}` : `#${ci.id} ×${ci.qty}`;
+            }).join(", ");
+            const t = new Date(o.time);
+            const timeStr = t.toLocaleString("vi-VN",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+            return `<tr>
+              <td><span style="font-family:var(--font-mono);font-size:0.78rem;font-weight:700">${o.id}</span></td>
+              <td><div style="font-weight:600">${o.name||"—"}</div><div style="font-size:0.72rem;color:var(--mid-gray)">${o.phone||""}</div></td>
+              <td style="max-width:180px;font-size:0.78rem">${itemNames||"—"}</td>
+              <td><span style="font-family:var(--font-mono);font-weight:700;color:var(--terracotta)">${formatPrice(o.total||0)}</span></td>
+              <td style="font-size:0.78rem">${payLabel[o.payMethod]||o.payMethod||"—"}</td>
+              <td><span class="sbadge ${sl.cls}">${sl.text}</span></td>
+              <td style="font-size:0.75rem;color:var(--mid-gray)">${timeStr}</td>
+              <td><div class="action-btns">
+                <button class="btn-view" onclick="viewOrder('${o.id}')">👁 Chi tiết</button>
+                ${o.status==="pending"||o.status==="awaiting_payment"?`<button class="btn-approve" onclick="updateOrderStatus('${o.id}','confirmed')">✅ Duyệt</button>`:""}
+                ${o.status==="confirmed"?`<button class="btn-approve" onclick="updateOrderStatus('${o.id}','shipping')">🚚 Giao hàng</button>`:""}
+                ${o.status==="shipping"?`<button class="btn-approve" onclick="updateOrderStatus('${o.id}','delivered')">📦 Đã giao</button>`:""}
+                ${o.status!=="delivered"&&o.status!=="cancelled"?`<button class="btn-reject" onclick="updateOrderStatus('${o.id}','cancelled')">❌ Hủy</button>`:""}
+              </div></td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table></div>`}
+    </div>`;
+}
+
+function viewOrder(id) {
+  const order = getOrders().find(o=>o.id===id);
+  if(!order) return;
+  const merch = getMerch();
+  const statusLabel = { pending:"⏳ Chờ xác nhận", awaiting_payment:"💳 Chờ thanh toán", confirmed:"✅ Đã xác nhận", shipping:"🚚 Đang giao", delivered:"📦 Đã giao", cancelled:"❌ Đã hủy" };
+  const itemRows = (order.items||[]).map(ci=>{
+    const m = merch.find(m=>Number(m.id)===Number(ci.id));
+    if(!m) return "";
+    return `<div style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;border-bottom:1px solid var(--cream-2)">
+      <div style="width:40px;height:40px;background:${m.bgColor};border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1.4rem">${m.emoji}</div>
+      <div style="flex:1"><div style="font-weight:600;font-size:0.88rem">${m.name}</div><div style="font-size:0.75rem;color:var(--mid-gray)">×${ci.qty}</div></div>
+      <div style="font-weight:700;color:var(--terracotta);font-size:0.88rem">${formatPrice(m.price*ci.qty)}</div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("modalContent").innerHTML = `
+    <h3 style="font-family:var(--font-display);margin-bottom:1rem">📦 Chi tiết đơn ${order.id}</h3>
+    <div class="modal-info-grid">
+      <div class="modal-info-item"><div class="modal-info-label">Khách hàng</div><div class="modal-info-val">${order.name||"—"}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">SĐT</div><div class="modal-info-val">${order.phone||"—"}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Email</div><div class="modal-info-val">${order.email||"—"}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Thanh toán</div><div class="modal-info-val">${order.payMethod==="qr"?"📱 Chuyển khoản QR":"💵 COD"}</div></div>
+      <div class="modal-info-item" style="grid-column:1/-1"><div class="modal-info-label">Địa chỉ giao hàng</div><div class="modal-info-val">${order.address||"—"}</div></div>
+      ${order.note?`<div class="modal-info-item" style="grid-column:1/-1"><div class="modal-info-label">Ghi chú</div><div class="modal-info-val">${order.note}</div></div>`:""}
+    </div>
+    <div style="margin:1rem 0">${itemRows}</div>
+    <div style="border-top:2px solid var(--cream-2);padding-top:0.75rem">
+      <div style="display:flex;justify-content:space-between;font-size:0.83rem;color:var(--mid-gray);margin-bottom:0.3rem"><span>Tạm tính</span><span>${formatPrice(order.subtotal||0)}</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:0.83rem;color:var(--mid-gray);margin-bottom:0.3rem"><span>Phí ship</span><span>${formatPrice(order.shipFee||30000)}</span></div>
+      ${order.discountAmt?`<div style="display:flex;justify-content:space-between;font-size:0.83rem;color:var(--green);margin-bottom:0.3rem"><span>Giảm giá</span><span>−${formatPrice(order.discountAmt)}</span></div>`:""}
+      <div style="display:flex;justify-content:space-between;font-size:1rem;font-weight:700;margin-top:0.5rem"><span>Tổng cộng</span><span style="color:var(--terracotta)">${formatPrice(order.total||0)}</span></div>
+    </div>
+    <div style="margin-top:1rem">
+      <label style="font-size:0.8rem;font-weight:600;display:block;margin-bottom:0.4rem">Cập nhật trạng thái</label>
+      <select id="orderStatusSelect" style="width:100%;padding:0.6rem;border:2px solid var(--light-gray);border-radius:6px;font-family:var(--font-body);margin-bottom:0.75rem">
+        ${["pending","awaiting_payment","confirmed","shipping","delivered","cancelled"].map(s=>`<option value="${s}" ${order.status===s?"selected":""}>${statusLabel[s]}</option>`).join("")}
+      </select>
+      <button class="btn-submit" style="width:100%;padding:0.75rem" onclick="updateOrderStatus('${order.id}',document.getElementById('orderStatusSelect').value)">Cập nhật đơn hàng</button>
+    </div>`;
+  openModal();
+}
+
+function updateOrderStatus(id, newStatus) {
+  const orders = getOrders();
+  const idx = orders.findIndex(o=>o.id===id);
+  if(idx===-1) return;
+  orders[idx].status = newStatus;
+  orders[idx].updatedTime = new Date().toLocaleString("vi-VN");
+  saveOrders(orders);
+  updatePendingBadge();
+  closeModal();
+  const labels = { confirmed:"✅ Đã xác nhận đơn!", shipping:"🚚 Đơn đang được giao!", delivered:"📦 Đã giao hàng thành công!", cancelled:"❌ Đã hủy đơn hàng." };
+  showToast(labels[newStatus]||"✅ Cập nhật thành công!");
+  renderOrders();
+}
+
+// ===== MERCH =====
 function renderMerch() {
   const merch = getMerch();
+  const orders = getOrders();
   const typeLabel = {apparel:"👕 Áo quần", accessory:"🎒 Phụ kiện", sticker:"🎨 Sticker", homeware:"🏠 Đồ nhà"};
+
+  // Tính số lượng đã bán cho từng sản phẩm
+  const soldMap = {};
+  orders.filter(o=>o.status!=="cancelled").forEach(o=>{
+    (o.items||[]).forEach(ci=>{ soldMap[Number(ci.id)] = (soldMap[Number(ci.id)]||0) + ci.qty; });
+  });
+
   document.getElementById("pageContent").innerHTML = `
     <div class="table-card">
       <div class="table-header">
@@ -676,24 +830,50 @@ function renderMerch() {
         <button class="btn-submit" style="padding:0.4rem 1rem;font-size:0.8rem" onclick="openAddMerchModal()">+ Thêm sản phẩm</button>
       </div>
       <div style="overflow-x:auto"><table class="tbl">
-        <thead><tr><th>Sản phẩm</th><th>Loại</th><th>Giá</th><th>Badge</th><th>Hành động</th></tr></thead>
+        <thead><tr><th>Sản phẩm</th><th>Loại</th><th>Giá</th><th>Tồn kho</th><th>Đã bán</th><th>Badge</th><th>Hành động</th></tr></thead>
         <tbody>
-          ${merch.map(m=>`<tr>
-            <td><div class="pet-cell">
-              <div class="pet-emoji-sm" style="background:${m.bgColor};font-size:1.5rem">${m.emoji}</div>
-              <div><div class="pet-cell-name">${m.name}</div><div class="pet-cell-sub">${m.desc}</div></div>
-            </div></td>
-            <td><span class="sbadge" style="background:#E8F0FF;color:var(--blue)">${typeLabel[m.type]||m.type}</span></td>
-            <td><span style="font-family:var(--font-mono);font-weight:700;color:var(--terracotta)">${formatPrice(m.price)}</span></td>
-            <td>${m.badge?`<span class="sbadge sbadge-approved">${m.badge}</span>`:"—"}</td>
-            <td><div class="action-btns">
-              <button class="btn-edit" onclick="openEditMerchModal(${m.id})">✏️ Sửa</button>
-              <button class="btn-delete" onclick="deleteMerch(${m.id})">🗑</button>
-            </div></td>
-          </tr>`).join("")}
+          ${merch.map(m=>{
+            const stock = m.stock !== undefined ? m.stock : 99;
+            const sold = soldMap[Number(m.id)]||0;
+            const stockColor = stock<=0?"var(--red)":stock<=5?"var(--yellow)":"var(--green)";
+            return `<tr>
+              <td><div class="pet-cell">
+                <div class="pet-emoji-sm" style="background:${m.bgColor};font-size:1.5rem">${m.emoji}</div>
+                <div><div class="pet-cell-name">${m.name}</div><div class="pet-cell-sub">${m.desc}</div></div>
+              </div></td>
+              <td><span class="sbadge" style="background:#E8F0FF;color:var(--blue)">${typeLabel[m.type]||m.type}</span></td>
+              <td><span style="font-family:var(--font-mono);font-weight:700;color:var(--terracotta)">${formatPrice(m.price)}</span></td>
+              <td>
+                <div style="display:flex;align-items:center;gap:0.5rem">
+                  <span style="font-family:var(--font-mono);font-weight:700;color:${stockColor}">${stock}</span>
+                  <div style="display:flex;gap:2px">
+                    <button onclick="adjustStock(${m.id},-1)" style="width:22px;height:22px;border:1px solid var(--light-gray);border-radius:4px;background:var(--cream);cursor:pointer;font-size:0.75rem">−</button>
+                    <button onclick="adjustStock(${m.id},1)" style="width:22px;height:22px;border:1px solid var(--light-gray);border-radius:4px;background:var(--cream);cursor:pointer;font-size:0.75rem">+</button>
+                  </div>
+                </div>
+              </td>
+              <td><span style="font-family:var(--font-mono);font-size:0.82rem">${sold}</span></td>
+              <td>${m.badge?`<span class="sbadge sbadge-approved">${m.badge}</span>`:"—"}</td>
+              <td><div class="action-btns">
+                <button class="btn-edit" onclick="openEditMerchModal(${m.id})">✏️ Sửa</button>
+                <button class="btn-delete" onclick="deleteMerch(${m.id})">🗑</button>
+              </div></td>
+            </tr>`;
+          }).join("")}
         </tbody>
       </table></div>
     </div>`;
+}
+
+function adjustStock(id, delta) {
+  const merch = getMerch();
+  const idx = merch.findIndex(m=>Number(m.id)===Number(id));
+  if(idx===-1) return;
+  const current = merch[idx].stock !== undefined ? merch[idx].stock : 99;
+  merch[idx].stock = Math.max(0, current + delta);
+  saveMerch(merch);
+  renderMerch();
+}
 }
 
 function openAddMerchModal() {
