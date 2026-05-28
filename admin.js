@@ -5,7 +5,7 @@
 // ===== STORAGE KEYS (đồng bộ với login.html) =====
 const STORAGE_KEY    = "pawlink_pets";
 const PENDING_KEY    = "pawlink_pending";
-const SESSION_KEY    = "pawlink_session";
+const SESSION_KEY    = "pawgen_session"; // ĐÃ SỬA: đồng bộ với app.js
 const USERS_KEY      = "pawlink_users";
 const FOSTERS_KEY    = "pawgen_fosters";
 const VOLUNTEERS_KEY = "pawgen_volunteers";
@@ -72,14 +72,12 @@ let editingFosterId = null, editingVolunteerId = null, editingMerchId = null;
 
 // ===== INIT =====
 document.addEventListener("DOMContentLoaded", () => {
-  // Luôn init sidebar + modal trước
   initSidebar();
   initModal();
   pendingList = getPending();
   approvedList = getApproved();
   updatePendingBadge();
 
-  // Kiểm tra session — nếu đã login admin thì vào luôn
   const sess = getSession();
   if (sess && sess.role === "admin") {
     document.getElementById("loginScreen").style.display = "none";
@@ -97,11 +95,9 @@ function initLogin() {
     const user = document.getElementById("loginUser").value.trim().toLowerCase();
     const pass = document.getElementById("loginPass").value.trim();
 
-    // Chấp nhận cả username "admin" lẫn email admin@pawlink.vn / admin@pawgen.vn
     const isAdminUser = (user === "admin" || user === "admin@pawlink.vn" || user === "admin@pawgen.vn");
     const isAdminPass = (pass === "pawgen123" || pass === "pawlink123");
 
-    // Cũng kiểm tra trong localStorage users
     let found = null;
     try {
       const users = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
@@ -109,9 +105,15 @@ function initLogin() {
     } catch {}
 
     if ((isAdminUser && isAdminPass) || found) {
-      // Lưu session
       const adminUser = found || { name:"Admin PAWGEN", email:"admin@pawgen.vn", role:"admin" };
-      localStorage.setItem(SESSION_KEY, JSON.stringify(adminUser));
+      // LƯU SESSION ĐÚNG CẤU TRÚC ĐỂ app.js NHẬN DIỆN
+      const sessionData = {
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role,
+        isLoggedIn: true
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
 
       document.getElementById("loginScreen").style.display = "none";
       document.getElementById("adminApp").style.display = "flex";
@@ -252,11 +254,9 @@ function approvePet(id) {
   const raw = pendingList[idx];
   const pet = {
     ...raw,
-    // map condition → status field used by trang chủ (urgent/watch/safe)
     status: raw.condition || "safe",
     approvedTime: new Date().toLocaleString("vi-VN"),
     id: Date.now(),
-    // ensure all fields trang chủ cần
     tags: raw.tags || [],
     fosterDays: raw.fosterDays || 0,
     costs: raw.costs || "0 VNĐ",
@@ -590,7 +590,7 @@ function renderVolunteers() {
         <button class="btn-submit" style="padding:0.4rem 1rem;font-size:0.8rem" onclick="openAddVolunteerModal()">+ Thêm mới</button>
       </div>
       <div style="overflow-x:auto"><table class="tbl">
-        <thead><tr><th>Tên</th><th>Vai trò</th><th>Khu vực</th><th>Nhiệm vụ</th><th>Trạng thái</th><th>Tham gia</th><th>Hành động</th></tr></thead>
+        <thead><tr><th>Tên</th><th>Vai trò</th><th>Khu vực</th><th>Nhiệm vụ</th><th>Trạng thái</th><th>Tham gia</th><th>Hành động</th></table></thead>
         <tbody>
           ${volunteers.map(v=>`<tr>
             <td><div class="pet-cell-name">${v.name}</div><div class="pet-cell-sub">${v.phone}</div></td>
@@ -672,7 +672,6 @@ function deleteVolunteer(id) {
   showToast("🗑 Đã xóa!"); renderVolunteers();
 }
 
-// ===== FIX #3: MERCH MANAGEMENT =====
 // ===== ORDERS =====
 function renderOrders(filterStatus="all") {
   const orders = getOrders();
@@ -722,7 +721,7 @@ function renderOrders(filterStatus="all") {
 
       ${filtered.length===0?`<div class="empty-state"><div class="empty-state-icon">📭</div><h3>Không có đơn hàng nào</h3></div>`:`
       <div style="overflow-x:auto"><table class="tbl">
-        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Thời gian</th><th>Hành động</th></tr></thead>
+        <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Sản phẩm</th><th>Tổng tiền</th><th>Thanh toán</th><th>Trạng thái</th><th>Thời gian</th><th>Hành động</th><tr></thead>
         <tbody>
           ${filtered.map(o=>{
             const sl = statusLabel[o.status]||{text:o.status,cls:""};
