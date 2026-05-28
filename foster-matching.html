@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ghép đôi Nuôi tạm - PAWCONNECT</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    .matching-container {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 2rem;
+    }
+    .section-title-matching {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      margin-bottom: 0.5rem;
+    }
+    .two-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .card-list {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-sm);
+    }
+    .card-header {
+      background: var(--terracotta);
+      color: white;
+      padding: 1rem 1.5rem;
+      font-weight: 700;
+    }
+    .card-item {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--cream-2);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .card-item:last-child {
+      border-bottom: none;
+    }
+    .pet-info-foster {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .pet-emoji-foster {
+      font-size: 2rem;
+      width: 50px;
+      height: 50px;
+      background: var(--cream);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .foster-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .foster-avatar {
+      width: 40px;
+      height: 40px;
+      background: var(--cream-2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    .status-badge-foster {
+      padding: 0.2rem 0.6rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .status-available {
+      background: #E8F5E9;
+      color: var(--green-safe);
+    }
+    .status-pending {
+      background: #FFF8E0;
+      color: var(--yellow-watch);
+    }
+    .status-matched {
+      background: #E3F2FD;
+      color: #1565C0;
+    }
+    .btn-match {
+      padding: 0.4rem 1rem;
+      background: var(--forest);
+      color: white;
+      border: none;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.75rem;
+      transition: var(--transition);
+    }
+    .btn-match:hover {
+      background: var(--forest-light);
+    }
+    .request-form {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-top: 2rem;
+      box-shadow: var(--shadow-sm);
+    }
+    .form-row-foster {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    @media (max-width: 768px) {
+      .two-columns {
+        grid-template-columns: 1fr;
+      }
+      .form-row-foster {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body style="background: var(--cream);">
+
+<div style="max-width: 1200px; margin: 0 auto; padding: 1rem;">
+  <a href="index.html" style="color: var(--terracotta); text-decoration: none;">← Quay lại trang chủ</a>
+</div>
+
+<div class="matching-container">
+  <h1 class="section-title-matching">🏠 Ghép đôi <em>Nuôi tạm</em></h1>
+  <p style="color: var(--mid-gray); margin-bottom: 2rem;">Kết nối thú cưng đang cần với người có khả năng nuôi tạm</p>
+  
+  <div class="two-columns">
+    <!-- Danh sách pet cần foster -->
+    <div class="card-list">
+      <div class="card-header">🐾 Thú cưng cần người nuôi tạm</div>
+      <div id="petsNeedFoster">
+        <!-- JS inject -->
+      </div>
+    </div>
+    
+    <!-- Danh sách foster đang sẵn sàng -->
+    <div class="card-list">
+      <div class="card-header">🏠 Người nuôi tạm sẵn sàng</div>
+      <div id="availableFosters">
+        <!-- JS inject -->
+      </div>
+    </div>
+  </div>
+  
+  <!-- Form đăng ký làm foster -->
+  <div class="request-form">
+    <h3 style="margin-bottom: 1rem;">📝 Đăng ký làm người nuôi tạm</h3>
+    <form id="fosterRequestForm">
+      <div class="form-row-foster">
+        <input type="text" id="fosterNameReq" placeholder="Họ tên *" required style="padding: 0.75rem; border: 2px solid var(--light-gray); border-radius: var(--radius-sm);">
+        <input type="tel" id="fosterPhoneReq" placeholder="Số điện thoại *" required style="padding: 0.75rem; border: 2px solid var(--light-gray); border-radius: var(--radius-sm);">
+        <input type="text" id="fosterAddressReq" placeholder="Địa chỉ / Quận *" required style="padding: 0.75rem; border: 2px solid var(--light-gray); border-radius: var(--radius-sm);">
+        <select id="fosterTypeReq" style="padding: 0.75rem; border: 2px solid var(--light-gray); border-radius: var(--radius-sm);">
+          <option>Có thể nuôi: Mèo</option>
+          <option>Có thể nuôi: Chó</option>
+          <option>Có thể nuôi: Cả hai</option>
+        </select>
+      </div>
+      <div class="form-row-foster">
+        <input type="number" id="fosterMaxReq" placeholder="Số lượng tối đa có thể nuôi" value="1" style="padding: 0.75rem; border: 2px solid var(--light-gray); border-radius: var(--radius-sm);">
+        <input type="text" id="fosterExperience" placeholder="Kinh nghiệm nuôi thú cưng" style="padding: 0.75rem; border: 2px solid var(--light-gray); border-radius: var(--radius-sm);">
+      </div>
+      <button type="submit" class="btn-primary" style="width: 100%;">Đăng ký làm foster →</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const PETS_KEY = "pawlink_pets";
+  const FOSTER_REQUESTS_KEY = "pawlink_foster_requests";
+  
+  // Dữ liệu mẫu
+  const DEFAULT_PETS = [
+    { id: 1, name: "Mochi", emoji: "🐱", type: "cat", location: "ĐH Bách Khoa", fosterStatus: "available", bgColor: "#FFF0E8" },
+    { id: 2, name: "Luna", emoji: "🐈", type: "cat", location: "ĐH Kinh tế", fosterStatus: "available", bgColor: "#FFEAEA" },
+    { id: 3, name: "Bông", emoji: "🐶", type: "dog", location: "Q.5", fosterStatus: "pending", bgColor: "#E8F0FF" },
+  ];
+  
+  const DEFAULT_FOSTERS = [
+    { id: 1, name: "Nguyễn Minh Anh", phone: "0901234567", address: "Quận 10", type: "cat", maxCapacity: 2, currentCount: 1, status: "available", avatar: "🌸" },
+    { id: 2, name: "Trần Hoàng Hùng", phone: "0912345678", address: "Thủ Đức", type: "both", maxCapacity: 1, currentCount: 0, status: "available", avatar: "🌟" },
+    { id: 3, name: "Lê Phương Linh", phone: "0987654321", address: "Quận 3", type: "cat", maxCapacity: 2, currentCount: 2, status: "full", avatar: "🎀" },
+  ];
+  
+  function getPets() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(PETS_KEY) || "[]");
+      const allPets = [...DEFAULT_PETS];
+      stored.forEach(p => {
+        if (!allPets.find(existing => existing.id === p.id)) {
+          allPets.push({ id: p.id, name: p.name, emoji: p.emoji, type: p.type, location: p.location, fosterStatus: "available", bgColor: p.bgColor });
+        }
+      });
+      return allPets;
+    } catch { return DEFAULT_PETS; }
+  }
+  
+  function getFosters() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(FOSTER_REQUESTS_KEY) || "[]");
+      const activeFosters = stored.filter(f => f.status === "approved").map(f => ({
+        id: f.id,
+        name: f.name,
+        phone: f.phone,
+        address: f.address,
+        type: f.type,
+        maxCapacity: f.maxCapacity || 1,
+        currentCount: 0,
+        status: "available",
+        avatar: f.avatar || "🐾"
+      }));
+      return [...DEFAULT_FOSTERS, ...activeFosters];
+    } catch { return DEFAULT_FOSTERS; }
+  }
+  
+  function renderPets() {
+    const pets = getPets();
+    const availablePets = pets.filter(p => p.fosterStatus === "available");
+    const container = document.getElementById("petsNeedFoster");
+    
+    if (availablePets.length === 0) {
+      container.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--mid-gray);">✨ Hiện không có thú cưng nào cần nuôi tạm</div>`;
+      return;
+    }
+    
+    container.innerHTML = availablePets.map(pet => `
+      <div class="card-item">
+        <div class="pet-info-foster">
+          <div class="pet-emoji-foster" style="background: ${pet.bgColor || '#FFF0E8'}">${pet.emoji}</div>
+          <div>
+            <div style="font-weight: 700;">${pet.name}</div>
+            <div style="font-size: 0.75rem; color: var(--mid-gray);">${pet.location} · ${pet.type === 'cat' ? '🐱 Mèo' : '🐶 Chó'}</div>
+          </div>
+        </div>
+        <button class="btn-match" onclick="requestMatch(${pet.id}, '${pet.name}')">🔍 Tìm foster</button>
+      </div>
+    `).join("");
+  }
+  
+  function renderFosters() {
+    const fosters = getFosters();
+    const availableFosters = fosters.filter(f => f.status === "available" && f.currentCount < f.maxCapacity);
+    const container = document.getElementById("availableFosters");
+    
+    if (availableFosters.length === 0) {
+      container.innerHTML = `<div style="padding: 2rem; text-align: center; color: var(--mid-gray);">⏳ Chưa có foster nào sẵn sàng</div>`;
+      return;
+    }
+    
+    container.innerHTML = availableFosters.map(foster => `
+      <div class="card-item">
+        <div class="foster-info">
+          <div class="foster-avatar">${foster.avatar}</div>
+          <div>
+            <div style="font-weight: 700;">${foster.name}</div>
+            <div style="font-size: 0.75rem; color: var(--mid-gray);">${foster.address} · Nuôi: ${foster.type === 'both' ? 'Mèo + Chó' : foster.type === 'cat' ? 'Mèo' : 'Chó'}</div>
+            <div style="font-size: 0.7rem;">📞 ${foster.phone}</div>
+          </div>
+        </div>
+        <div>
+          <span class="status-badge-foster status-available">🟢 Còn ${foster.maxCapacity - foster.currentCount} chỗ</span>
+          <button class="btn-match" style="background: var(--terracotta); margin-left: 0.5rem;" onclick="contactFoster('${foster.phone}', '${foster.name}')">Liên hệ</button>
+        </div>
+      </div>
+    `).join("");
+  }
+  
+  function requestMatch(petId, petName) {
+    showToast(`🔍 Đang tìm foster phù hợp cho ${petName}...`);
+    // Giả lập tìm foster
+    setTimeout(() => {
+      showToast(`✅ Đã gửi yêu cầu! Sẽ có foster liên hệ bạn trong 30 phút.`);
+    }, 1500);
+  }
+  
+  function contactFoster(phone, name) {
+    showToast(`📞 Liên hệ ${name} qua số: ${phone}`);
+  }
+  
+  function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--charcoal);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 30px;
+      z-index: 9999;
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+  
+  // Form đăng ký foster
+  const fosterForm = document.getElementById("fosterRequestForm");
+  if (fosterForm) {
+    fosterForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("fosterNameReq")?.value;
+      const phone = document.getElementById("fosterPhoneReq")?.value;
+      const address = document.getElementById("fosterAddressReq")?.value;
+      const type = document.getElementById("fosterTypeReq")?.value;
+      const maxCapacity = parseInt(document.getElementById("fosterMaxReq")?.value) || 1;
+      const experience = document.getElementById("fosterExperience")?.value;
+      
+      if (!name || !phone || !address) {
+        showToast("⚠️ Vui lòng điền đầy đủ thông tin!");
+        return;
+      }
+      
+      const newId = Date.now();
+      const typeCode = type.includes("Cả hai") ? "both" : type.includes("Mèo") ? "cat" : "dog";
+      const typeLabel = typeCode === "both" ? "Chó + Mèo" : typeCode === "cat" ? "Mèo" : "Chó";
+
+      // Lưu vào danh sách request riêng
+      const requests = JSON.parse(localStorage.getItem(FOSTER_REQUESTS_KEY) || "[]");
+      requests.push({
+        id: newId, name, phone, address, type: typeCode,
+        maxCapacity, experience, status: "pending", time: new Date().toISOString()
+      });
+      localStorage.setItem(FOSTER_REQUESTS_KEY, JSON.stringify(requests));
+
+      // ĐỒNG THỜI lưu vào pawgen_fosters để Admin thấy ngay
+      const FOSTERS_KEY = "pawgen_fosters";
+      let fosters = [];
+      try { fosters = JSON.parse(localStorage.getItem(FOSTERS_KEY) || "[]"); } catch {}
+      fosters.push({
+        id: newId, name, phone, area: address, type: typeLabel,
+        rating: 5, current: 0, max: maxCapacity,
+        avatar: "🐾", joined: new Date().toLocaleDateString("vi-VN"),
+        status: "active", source: "foster-matching"
+      });
+      localStorage.setItem(FOSTERS_KEY, JSON.stringify(fosters));
+      
+      showToast("✅ Đăng ký thành công! Admin sẽ duyệt và liên hệ bạn trong 24h.");
+      fosterForm.reset();
+    });
+  }
+  
+  renderPets();
+  renderFosters();
+</script>
+</body>
+</html>

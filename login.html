@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PawLink — Đăng nhập</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FAF6F0;
+      --cream2: #F2EAE0;
+      --terra: #D4603A;
+      --terra-dk: #A8452A;
+      --forest: #2D5016;
+      --forest-lt: #4A7A28;
+      --char: #1C1C1C;
+      --mgray: #8A8A8A;
+      --lgray: #D9D0C6;
+      --red: #E83030;
+      --green: #2D8A3E;
+      --font: 'DM Sans', system-ui, sans-serif;
+      --rm: 8px;
+      --rml: 16px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      background: var(--char);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(212,96,58,.18) 0%, transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(201,151,59,.12) 0%, transparent 50%),
+        radial-gradient(circle at 60% 85%, rgba(45,80,22,.15) 0%, transparent 50%);
+    }
+
+    /* Floating paws */
+    .bg-paws { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-paw { position: absolute; font-size: 1.5rem; opacity: 0.04; animation: floatUp linear infinite; }
+    @keyframes floatUp {
+      0%   { transform: translateY(110vh) rotate(0deg); }
+      100% { transform: translateY(-20vh) rotate(360deg); }
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: 420px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .logo { text-align: center; margin-bottom: 1.75rem; }
+    .logo-title {
+      font-size: 2rem;
+      color: var(--terra);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      font-weight: 700;
+    }
+    .logo p { font-size: .82rem; color: rgba(255,255,255,.4); margin-top: .35rem; }
+
+    .card {
+      background: #fff;
+      border-radius: var(--rml);
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(28,28,28,.12);
+      animation: cardIn .35s ease;
+    }
+    @keyframes cardIn {
+      from { transform: translateY(24px) scale(.97); opacity: 0; }
+      to   { transform: none; opacity: 1; }
+    }
+
+    /* Tabs */
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; background: var(--cream2); }
+    .tab {
+      padding: 1rem;
+      border: none;
+      background: none;
+      font-family: var(--font);
+      font-size: .88rem;
+      font-weight: 600;
+      color: var(--mgray);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all .2s;
+    }
+    .tab.active { background: #fff; color: var(--terra); border-bottom-color: var(--terra); }
+
+    .body { padding: 1.75rem; }
+
+    /* Guest box */
+    .guest-box {
+      border: 2px dashed var(--lgray);
+      border-radius: var(--rm);
+      padding: 1.5rem;
+      text-align: center;
+      background: var(--cream);
+      margin-bottom: 1.25rem;
+    }
+    .guest-icon { font-size: 2.5rem; margin-bottom: .6rem; }
+    .guest-box h3 { font-size: 1rem; font-weight: 700; color: var(--char); margin-bottom: .35rem; }
+    .guest-box p { font-size: .8rem; color: var(--mgray); line-height: 1.55; }
+
+    .btn-guest {
+      display: block;
+      width: 100%;
+      padding: .85rem;
+      border: none;
+      border-radius: var(--rm);
+      background: var(--terra);
+      color: #fff;
+      font-family: var(--font);
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 1rem;
+      transition: all .2s;
+    }
+    .btn-guest:hover { background: var(--terra-dk); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,96,58,.3); }
+
+    .or-note { font-size: .75rem; color: var(--mgray); text-align: center; margin: .75rem 0; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+    /* Admin panel */
+    .admin-badge {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      background: #EDF5E8;
+      border: 1px solid #B8D8A0;
+      border-radius: var(--rm);
+      padding: .6rem .875rem;
+      font-size: .78rem;
+      color: var(--forest);
+      margin-bottom: 1.25rem;
+    }
+
+    .fgroup { margin-bottom: 1rem; }
+    .fgroup label { display: block; font-size: .8rem; font-weight: 600; margin-bottom: .35rem; color: var(--char); }
+    .fgroup input {
+      width: 100%;
+      padding: .7rem 1rem;
+      border: 2px solid var(--lgray);
+      border-radius: var(--rm);
+      font-family: var(--font);
+      font-size: .88rem;
+      background: var(--cream);
+      color: var(--char);
+      outline: none;
+      transition: all .2s;
+    }
+    .fgroup input:focus { border-color: var(--forest); background: #fff; }
+
+    .input-wrap { position: relative; }
+    .toggle-pw {
+      position: absolute;
+      right: .875rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--mgray);
+      font-size: .9rem;
+    }
+
+    .btn-admin {
+      width: 100%;
+      padding: .85rem;
+      border: none;
+      border-radius: var(--rm);
+      background: var(--forest);
+      color: #fff;
+      font-family: var(--font);
+      font-size: .95rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: .25rem;
+      transition: all .2s;
+    }
+    .btn-admin:hover { background: var(--forest-lt); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,80,22,.3); }
+
+    .auth-msg {
+      display: none;
+      padding: .6rem .875rem;
+      border-radius: var(--rm);
+      font-size: .8rem;
+      font-weight: 500;
+      margin-top: .75rem;
+      text-align: center;
+    }
+    .auth-msg.error   { display: block; background: #FFEAEA; color: var(--red); }
+    .auth-msg.success { display: block; background: #E8F5E9; color: var(--green); }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .back { text-align: center; margin-top: 1.5rem; }
+    .back a { color: rgba(255,255,255,.45); font-size: .8rem; text-decoration: none; transition: all .2s; }
+    .back a:hover { color: rgba(255,255,255,.8); }
+
+    @media (max-width: 480px) {
+      body { padding: 1rem; }
+      .body { padding: 1.25rem; }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-paws" id="bgPaws"></div>
+
+<div class="wrap">
+  <div class="logo">
+    <a class="logo-title" href="index.html">🐾 PawLink</a>
+    <p>Cùng nhau cứu sống từng sinh linh nhỏ</p>
+  </div>
+
+  <div class="card">
+    <div class="tabs">
+      <button class="tab active" id="tabGuest" onclick="switchTab('guest')">👤 Vào thăm</button>
+      <button class="tab"        id="tabAdmin" onclick="switchTab('admin')">🛡️ Quản trị</button>
+    </div>
+
+    <div class="body">
+
+      <!-- GUEST PANEL -->
+      <div class="panel active" id="panelGuest">
+        <div class="guest-box">
+          <div class="guest-icon">🐾</div>
+          <h3>Không cần tài khoản!</h3>
+          <p>Bạn có thể báo cứu hộ, xem thú cưng cần nhà và khám phá cộng đồng ngay mà không cần đăng ký.</p>
+          <button class="btn-guest" onclick="enterAsGuest()">Vào khám phá ngay →</button>
+        </div>
+
+        <div class="or-note">Hoặc nếu bạn đã có tài khoản cộng đồng từ trước</div>
+
+        <div class="two-col">
+          <div class="fgroup" style="margin:0">
+            <label>Email</label>
+            <input type="email" id="guestEmail" placeholder="ban@email.com"/>
+          </div>
+          <div class="fgroup" style="margin:0">
+            <label>Mật khẩu</label>
+            <input type="password" id="guestPassword" placeholder="••••••"/>
+          </div>
+        </div>
+
+        <button class="btn-guest" style="margin-top:.75rem;background:#888;box-shadow:none" onclick="handleUserLogin()">
+          Đăng nhập tài khoản
+        </button>
+        <div class="auth-msg" id="guestMsg"></div>
+      </div>
+
+      <!-- ADMIN PANEL -->
+      <div class="panel" id="panelAdmin">
+        <div class="admin-badge">🛡️ Khu vực dành riêng cho quản trị viên PawLink</div>
+        <form onsubmit="handleAdminLogin(event)">
+          <div class="fgroup">
+            <label>Email quản trị</label>
+            <input type="email" id="adminEmail" placeholder="admin@pawlink.vn" required autocomplete="email"/>
+          </div>
+          <div class="fgroup">
+            <label>Mật khẩu</label>
+            <div class="input-wrap">
+              <input type="password" id="adminPassword" placeholder="••••••••" required/>
+              <button type="button" class="toggle-pw" onclick="togglePw('adminPassword', this)">👁</button>
+            </div>
+          </div>
+          <button type="submit" class="btn-admin">🛡️ Vào trang quản trị →</button>
+          <div class="auth-msg" id="adminMsg"></div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="back"><a href="index.html">← Quay về trang chủ</a></div>
+</div>
+
+<script>
+  // Floating paws
+  const container = document.getElementById("bgPaws");
+  ["🐾","🐱","🐶","❤️","🐾","😺"].forEach(p => {
+    const el = document.createElement("div");
+    el.className = "bg-paw";
+    el.textContent = p;
+    el.style.left = `${Math.random() * 100}%`;
+    el.style.animationDuration = `${10 + Math.random() * 15}s`;
+    el.style.animationDelay = `${Math.random() * 20}s`;
+    container.appendChild(el);
+  });
+
+  const USERS_KEY   = "pawlink_users";
+  const SESSION_KEY = "pawlink_session";
+
+  function getUsers() {
+    try {
+      const stored = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+      if (!stored.find(u => u.email === "admin@pawlink.vn")) {
+        stored.push({ name: "Admin PawLink", email: "admin@pawlink.vn", password: "pawlink123", role: "admin" });
+        localStorage.setItem(USERS_KEY, JSON.stringify(stored));
+      }
+      return stored;
+    } catch { return []; }
+  }
+
+  function saveSession(u) { localStorage.setItem(SESSION_KEY, JSON.stringify(u)); }
+  function getSession()   { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } }
+
+  // Auto-redirect nếu đã login admin
+  const sess = getSession();
+  if (sess && sess.role === "admin") window.location.href = "admin.html";
+
+  function switchTab(tab) {
+    document.getElementById("tabGuest").classList.toggle("active", tab === "guest");
+    document.getElementById("tabAdmin").classList.toggle("active", tab === "admin");
+    document.getElementById("panelGuest").classList.toggle("active", tab === "guest");
+    document.getElementById("panelAdmin").classList.toggle("active", tab === "admin");
+  }
+
+  function enterAsGuest() {
+    saveSession({ name: "Khách", role: "guest" });
+    window.location.href = "index.html";
+  }
+
+  function handleUserLogin() {
+    const email = document.getElementById("guestEmail").value.trim().toLowerCase();
+    const pw    = document.getElementById("guestPassword").value;
+    if (!email || !pw) { showMsg("guestMsg", "Vui lòng nhập email và mật khẩu!", "error"); return; }
+    const u = getUsers().find(x => x.email === email && x.password === pw);
+    if (!u) { showMsg("guestMsg", "❌ Email hoặc mật khẩu không đúng!", "error"); return; }
+    if (u.role === "admin") { showMsg("guestMsg", "Tài khoản admin vui lòng dùng tab Quản trị!", "error"); return; }
+    saveSession(u);
+    showMsg("guestMsg", `✅ Chào mừng ${u.name}! Đang chuyển...`, "success");
+    setTimeout(() => window.location.href = "index.html", 1000);
+  }
+
+  function handleAdminLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById("adminEmail").value.trim().toLowerCase();
+    const pw    = document.getElementById("adminPassword").value;
+    const u = getUsers().find(x => x.email === email && x.password === pw && x.role === "admin");
+    if (!u) { showMsg("adminMsg", "❌ Sai thông tin admin!", "error"); return; }
+    saveSession(u);
+    showMsg("adminMsg", `✅ Xin chào ${u.name}! Đang chuyển...`, "success");
+    setTimeout(() => window.location.href = "admin.html", 1000);
+  }
+
+  function togglePw(id, btn) {
+    const el = document.getElementById(id);
+    if (el.type === "password") { el.type = "text"; btn.textContent = "🙈"; }
+    else { el.type = "password"; btn.textContent = "👁"; }
+  }
+
+  function showMsg(id, msg, type) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.className = "auth-msg " + type;
+    setTimeout(() => el.className = "auth-msg", 4000);
+  }
+
+  getUsers(); // seed admin
+</script>
+</body>
+</html>

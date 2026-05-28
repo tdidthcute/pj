@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAWGEN — Đăng nhập / Đăng ký</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --cream: #FAF6F0;
+      --cream-2: #F2EAE0;
+      --terracotta: #D4603A;
+      --terracotta-dark: #A8452A;
+      --forest: #2D5016;
+      --forest-light: #4A7A28;
+      --gold: #C9973B;
+      --charcoal: #1C1C1C;
+      --mid-gray: #8A8A8A;
+      --light-gray: #D9D0C6;
+      --white: #FFFFFF;
+      --red: #E83030;
+      --green: #2D8A3E;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --font-mono: 'Space Mono', monospace;
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --shadow-md: 0 8px 32px rgba(28,28,28,0.12);
+      --transition: all 0.25s cubic-bezier(0.4,0,0.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-body);
+      background: var(--charcoal);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background-image:
+        radial-gradient(circle at 20% 50%, rgba(212,96,58,0.18) 0%, transparent 55%),
+        radial-gradient(circle at 85% 20%, rgba(201,151,59,0.12) 0%, transparent 50%),
+        radial-gradient(circle at 60% 85%, rgba(45,80,22,0.15) 0%, transparent 50%);
+    }
+
+    /* floating paws bg */
+    .bg-paws { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+    .bg-paw { position: absolute; font-size: 1.5rem; opacity: 0.04; animation: floatUp linear infinite; }
+    @keyframes floatUp {
+      0% { transform: translateY(110vh) rotate(0deg); }
+      100% { transform: translateY(-20vh) rotate(360deg); }
+    }
+
+    .auth-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 460px;
+    }
+
+    /* Logo */
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .auth-logo a {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      color: var(--terracotta);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .auth-logo p {
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.45);
+      margin-top: 0.4rem;
+    }
+
+    /* Card */
+    .auth-card {
+      background: var(--white);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+      animation: cardIn 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    @keyframes cardIn {
+      from { transform: translateY(28px) scale(0.97); opacity: 0; }
+      to   { transform: translateY(0) scale(1); opacity: 1; }
+    }
+
+    /* Tabs */
+    .auth-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--cream-2);
+    }
+    .auth-tab {
+      padding: 1rem;
+      border: none;
+      background: none;
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--mid-gray);
+      cursor: pointer;
+      transition: var(--transition);
+      border-bottom: 3px solid transparent;
+    }
+    .auth-tab.active {
+      background: var(--white);
+      color: var(--terracotta);
+      border-bottom-color: var(--terracotta);
+    }
+
+    /* Body */
+    .auth-body { padding: 2rem; }
+
+    /* Role selector */
+    .role-selector {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+    .role-opt {
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-sm);
+      padding: 1rem 0.75rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--cream);
+    }
+    .role-opt:hover { border-color: var(--terracotta); }
+    .role-opt.selected {
+      border-color: var(--terracotta);
+      background: #FFF0E8;
+    }
+    .role-opt.selected.admin-role {
+      border-color: var(--forest);
+      background: #EDF5E8;
+    }
+    .role-icon { font-size: 1.75rem; margin-bottom: 0.4rem; }
+    .role-name { font-size: 0.82rem; font-weight: 700; }
+    .role-desc { font-size: 0.7rem; color: var(--mid-gray); margin-top: 0.2rem; }
+
+    /* Form groups */
+    .fgroup { margin-bottom: 1.1rem; }
+    .fgroup label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: var(--charcoal);
+    }
+    .fgroup input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 0.9rem;
+      background: var(--cream);
+      color: var(--charcoal);
+      outline: none;
+      transition: var(--transition);
+    }
+    .fgroup input:focus {
+      border-color: var(--terracotta);
+      background: var(--white);
+    }
+    .fgroup input.admin-focus:focus { border-color: var(--forest); }
+
+    .input-wrap { position: relative; }
+    .toggle-pw {
+      position: absolute;
+      right: 0.875rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      font-size: 1rem; cursor: pointer;
+      color: var(--mid-gray);
+      transition: var(--transition);
+    }
+    .toggle-pw:hover { color: var(--charcoal); }
+
+    /* Admin hint */
+    .admin-hint {
+      display: none;
+      background: #EDF5E8;
+      border: 1px solid #B8D8A0;
+      border-radius: var(--radius-sm);
+      padding: 0.6rem 0.875rem;
+      font-size: 0.78rem;
+      color: var(--forest);
+      margin-bottom: 1rem;
+    }
+    .admin-hint.show { display: flex; align-items: center; gap: 0.5rem; }
+
+    /* Submit */
+    .btn-auth {
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-family: var(--font-body);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: var(--transition);
+      margin-top: 0.5rem;
+    }
+    .btn-auth.user-btn {
+      background: var(--terracotta);
+      color: var(--white);
+    }
+    .btn-auth.user-btn:hover { background: var(--terracotta-dark); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,96,58,0.3); }
+    .btn-auth.admin-btn {
+      background: var(--forest);
+      color: var(--white);
+    }
+    .btn-auth.admin-btn:hover { background: var(--forest-light); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(45,80,22,0.3); }
+
+    /* Divider */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+      color: var(--mid-gray);
+      font-size: 0.78rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--light-gray);
+    }
+
+    /* Google btn */
+    .btn-google {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--light-gray);
+      border-radius: var(--radius-sm);
+      background: var(--white);
+      font-family: var(--font-body);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--charcoal);
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-google:hover { border-color: var(--terracotta); background: var(--cream); }
+
+    /* Error / success */
+    .auth-msg {
+      display: none;
+      padding: 0.65rem 0.875rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.82rem;
+      font-weight: 500;
+      margin-top: 0.75rem;
+      text-align: center;
+    }
+    .auth-msg.error { display: block; background: #FFEAEA; color: var(--red); }
+    .auth-msg.success { display: block; background: #E8F5E9; color: var(--green); }
+
+    /* Terms */
+    .terms-note {
+      font-size: 0.72rem;
+      color: var(--mid-gray);
+      text-align: center;
+      margin-top: 1rem;
+      line-height: 1.6;
+    }
+    .terms-note a { color: var(--terracotta); text-decoration: none; }
+
+    /* Back link */
+    .back-link {
+      text-align: center;
+      margin-top: 1.5rem;
+    }
+    .back-link a {
+      color: rgba(255,255,255,0.5);
+      font-size: 0.82rem;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .back-link a:hover { color: rgba(255,255,255,0.85); }
+
+    /* Already have account */
+    .switch-note {
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--mid-gray);
+      margin-top: 1.25rem;
+    }
+    .switch-note button {
+      background: none;
+      border: none;
+      color: var(--terracotta);
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+    }
+
+    /* Panel hidden */
+    .auth-panel { display: none; }
+    .auth-panel.active { display: block; }
+
+    /* Password strength */
+    .pw-strength { margin-top: 0.4rem; display: flex; gap: 3px; }
+    .pw-bar { height: 3px; flex: 1; border-radius: 2px; background: var(--light-gray); transition: var(--transition); }
+    .pw-label { font-size: 0.7rem; color: var(--mid-gray); margin-top: 0.2rem; }
+
+    /* Profile pill in nav (injected) */
+    .user-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.875rem 0.35rem 0.5rem;
+      background: var(--cream-2);
+      border: 1.5px solid var(--light-gray);
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-decoration: none;
+      color: var(--charcoal);
+    }
+    .user-pill:hover { border-color: var(--terracotta); }
+    .user-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--terracotta); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: #fff; }
+
+    @media (max-width: 500px) {
+      body { padding: 1rem; }
+      .auth-body { padding: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-paws" id="bgPaws"></div>
+
+  <div class="auth-wrapper">
+    <div class="auth-logo">
+      <a href="index.html">🐾 PAWGEN</a>
+      <p>Cùng nhau cứu sống từng sinh linh nhỏ</p>
+    </div>
+
+    <div class="auth-card">
+      <!-- TABS -->
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Đăng nhập</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Đăng ký</button>
+      </div>
+
+      <div class="auth-body">
+
+        <!-- ===== LOGIN PANEL ===== -->
+        <div class="auth-panel active" id="panelLogin">
+          <div class="role-selector" id="loginRoles">
+            <div class="role-opt selected" id="roleUserLogin" onclick="selectRole('login','user')">
+              <div class="role-icon">👤</div>
+              <div class="role-name">Người dùng</div>
+              <div class="role-desc">Báo cứu hộ, theo dõi thú cưng</div>
+            </div>
+            <div class="role-opt admin-role" id="roleAdminLogin" onclick="selectRole('login','admin')">
+              <div class="role-icon">🛡️</div>
+              <div class="role-name">Quản trị viên</div>
+              <div class="role-desc">Duyệt, chỉnh sửa, quản lý</div>
+            </div>
+          </div>
+
+          <div class="admin-hint" id="adminHintLogin">
+            🛡️ Tài khoản admin: <strong>admin@pawgen.vn</strong> / <strong>pawgen123</strong>
+          </div>
+
+          <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="fgroup">
+              <label>Email</label>
+              <input type="email" id="loginEmail" placeholder="ban@email.com" required autocomplete="email"/>
+            </div>
+            <div class="fgroup">
+              <label>Mật khẩu</label>
+              <div class="input-wrap">
+                <input type="password" id="loginPassword" placeholder="••••••••" required/>
+                <button type="button" class="toggle-pw" onclick="togglePw('loginPassword', this)">👁</button>
+              </div>
+            </div>
+            <div style="text-align:right;margin-bottom:0.75rem">
+              <button type="button" onclick="showMsg('loginMsg','Tính năng đang phát triển! Liên hệ admin@pawgen.vn','error')" style="background:none;border:none;font-size:0.78rem;color:var(--mid-gray);cursor:pointer;font-family:var(--font-body)">Quên mật khẩu?</button>
+            </div>
+            <button type="submit" class="btn-auth user-btn" id="loginBtn">Đăng nhập →</button>
+            <div class="auth-msg" id="loginMsg"></div>
+          </form>
+
+          <div class="divider">hoặc</div>
+          <button class="btn-google" onclick="handleGoogleLogin()">
+            <span style="font-size:1.1rem">🌐</span> Tiếp tục với Google
+          </button>
+
+          <div class="switch-note">
+            Chưa có tài khoản? <button onclick="switchTab('register')">Đăng ký ngay</button>
+          </div>
+        </div>
+
+        <!-- ===== REGISTER PANEL ===== -->
+        <div class="auth-panel" id="panelRegister">
+          <div class="role-selector">
+            <div class="role-opt selected" id="roleUserReg" onclick="selectRole('register','user')">
+              <div class="role-icon">🐾</div>
+              <div class="role-name">Cộng đồng</div>
+              <div class="role-desc">Báo cứu hộ, donate, nhận nuôi</div>
+            </div>
+            <div class="role-opt" id="roleFosterReg" onclick="selectRole('register','foster')">
+              <div class="role-icon">🏠</div>
+              <div class="role-name">Foster / TNV</div>
+              <div class="role-desc">Nuôi tạm, tình nguyện viên</div>
+            </div>
+          </div>
+
+          <form id="registerForm" onsubmit="handleRegister(event)">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem">
+              <div class="fgroup">
+                <label>Họ tên *</label>
+                <input type="text" id="regName" placeholder="Nguyễn Văn A" required/>
+              </div>
+              <div class="fgroup">
+                <label>Số điện thoại</label>
+                <input type="tel" id="regPhone" placeholder="0901 234 567"/>
+              </div>
+            </div>
+            <div class="fgroup">
+              <label>Email *</label>
+              <input type="email" id="regEmail" placeholder="ban@email.com" required/>
+            </div>
+            <div class="fgroup" id="locationGroup">
+              <label>Quận / Khu vực</label>
+              <input type="text" id="regLocation" placeholder="VD: Quận 10, TP.HCM"/>
+            </div>
+            <div class="fgroup">
+              <label>Mật khẩu *</label>
+              <div class="input-wrap">
+                <input type="password" id="regPassword" placeholder="Tối thiểu 6 ký tự" required oninput="checkStrength(this.value)"/>
+                <button type="button" class="toggle-pw" onclick="togglePw('regPassword', this)">👁</button>
+              </div>
+              <div class="pw-strength" id="pwStrength">
+                <div class="pw-bar" id="bar1"></div>
+                <div class="pw-bar" id="bar2"></div>
+                <div class="pw-bar" id="bar3"></div>
+                <div class="pw-bar" id="bar4"></div>
+              </div>
+              <div class="pw-label" id="pwLabel"></div>
+            </div>
+            <div class="fgroup">
+              <label>Xác nhận mật khẩu *</label>
+              <div class="input-wrap">
+                <input type="password" id="regConfirm" placeholder="Nhập lại mật khẩu" required/>
+                <button type="button" class="toggle-pw" onclick="togglePw('regConfirm', this)">👁</button>
+              </div>
+            </div>
+            <button type="submit" class="btn-auth user-btn">Tạo tài khoản 🐾</button>
+            <div class="auth-msg" id="registerMsg"></div>
+          </form>
+
+          <p class="terms-note">
+            Bằng cách đăng ký, bạn đồng ý với <a href="#">Điều khoản dịch vụ</a> và <a href="#">Chính sách bảo mật</a> của PAWGEN.
+          </p>
+
+          <div class="switch-note">
+            Đã có tài khoản? <button onclick="switchTab('login')">Đăng nhập</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="back-link">
+      <a href="index.html">← Quay về trang chủ</a>
+    </div>
+  </div>
+
+  <script>
+    // ===== FLOATING PAWS =====
+    const container = document.getElementById("bgPaws");
+    ["🐾","🐱","🐶","❤️","🐾","😺"].forEach((p, i) => {
+      const el = document.createElement("div");
+      el.className = "bg-paw";
+      el.textContent = p;
+      el.style.left = `${Math.random() * 100}%`;
+      el.style.animationDuration = `${10 + Math.random() * 15}s`;
+      el.style.animationDelay = `${Math.random() * 20}s`;
+      container.appendChild(el);
+    });
+
+    // ===== STATE =====
+    let currentTab = "login";
+    let loginRole = "user";   // user | admin
+    let registerRole = "user"; // user | foster
+
+    const USERS_KEY = "pawgen_users";
+    const SESSION_KEY = "pawgen_session";
+
+    // Seed admin account
+    function getUsers() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(USERS_KEY) || "[]");
+        // Always ensure admin exists
+        if (!stored.find(u => u.email === "admin@pawgen.vn")) {
+          stored.push({ name: "Admin PAWGEN", email: "admin@pawgen.vn", password: "pawgen123", role: "admin", phone: "", location: "", joined: new Date().toLocaleDateString("vi-VN") });
+          localStorage.setItem(USERS_KEY, JSON.stringify(stored));
+        }
+        return stored;
+      } catch { return []; }
+    }
+
+    function saveUsers(users) { localStorage.setItem(USERS_KEY, JSON.stringify(users)); }
+    function saveSession(user) { localStorage.setItem(SESSION_KEY, JSON.stringify(user)); }
+    function getSession() { try { return JSON.parse(localStorage.getItem(SESSION_KEY)); } catch { return null; } }
+
+    // Auto-redirect if already logged in
+    const session = getSession();
+    if (session) {
+      if (session.role === "admin") window.location.href = "admin.html";
+      else window.location.href = "index.html";
+    }
+
+    // ===== TABS =====
+    function switchTab(tab) {
+      currentTab = tab;
+      document.getElementById("tabLogin").classList.toggle("active", tab === "login");
+      document.getElementById("tabRegister").classList.toggle("active", tab === "register");
+      document.getElementById("panelLogin").classList.toggle("active", tab === "login");
+      document.getElementById("panelRegister").classList.toggle("active", tab === "register");
+    }
+
+    // ===== ROLE SELECT =====
+    function selectRole(panel, role) {
+      if (panel === "login") {
+        loginRole = role;
+        document.getElementById("roleUserLogin").classList.toggle("selected", role === "user");
+        document.getElementById("roleAdminLogin").classList.toggle("selected", role === "admin");
+        document.getElementById("adminHintLogin").classList.toggle("show", role === "admin");
+        const btn = document.getElementById("loginBtn");
+        btn.className = role === "admin" ? "btn-auth admin-btn" : "btn-auth user-btn";
+        btn.textContent = role === "admin" ? "🛡️ Vào trang quản trị →" : "Đăng nhập →";
+      } else {
+        registerRole = role;
+        document.getElementById("roleUserReg").classList.toggle("selected", role === "user");
+        document.getElementById("roleFosterReg").classList.toggle("selected", role === "foster");
+      }
+    }
+
+    // ===== LOGIN =====
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+      const password = document.getElementById("loginPassword").value;
+      const users = getUsers();
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        showMsg("loginMsg", "❌ Email hoặc mật khẩu không đúng!", "error");
+        return;
+      }
+
+      if (loginRole === "admin" && user.role !== "admin") {
+        showMsg("loginMsg", "❌ Tài khoản này không có quyền admin!", "error");
+        return;
+      }
+
+      if (loginRole === "user" && user.role === "admin") {
+        // Admin can also login as user but redirect to admin
+      }
+
+      saveSession(user);
+      showMsg("loginMsg", `✅ Xin chào ${user.name}! Đang chuyển hướng...`, "success");
+
+      setTimeout(() => {
+        if (user.role === "admin") window.location.href = "admin.html";
+        else window.location.href = "index.html";
+      }, 1000);
+    }
+
+    // ===== REGISTER =====
+    function handleRegister(e) {
+      e.preventDefault();
+      const name = document.getElementById("regName").value.trim();
+      const email = document.getElementById("regEmail").value.trim().toLowerCase();
+      const phone = document.getElementById("regPhone").value.trim();
+      const location = document.getElementById("regLocation").value.trim();
+      const password = document.getElementById("regPassword").value;
+      const confirm = document.getElementById("regConfirm").value;
+
+      if (password.length < 6) { showMsg("registerMsg", "❌ Mật khẩu phải có ít nhất 6 ký tự!", "error"); return; }
+      if (password !== confirm) { showMsg("registerMsg", "❌ Mật khẩu xác nhận không khớp!", "error"); return; }
+
+      const users = getUsers();
+      if (users.find(u => u.email === email)) {
+        showMsg("registerMsg", "❌ Email này đã được đăng ký!", "error");
+        return;
+      }
+
+      const newUser = {
+        name, email, password,
+        phone, location,
+        role: registerRole, // user | foster
+        joined: new Date().toLocaleDateString("vi-VN"),
+        reports: [], // rescue reports
+        avatar: name.charAt(0).toUpperCase()
+      };
+
+      users.push(newUser);
+      saveUsers(users);
+      saveSession(newUser);
+
+      showMsg("registerMsg", `✅ Tạo tài khoản thành công! Chào mừng ${name}!`, "success");
+      setTimeout(() => window.location.href = "index.html", 1200);
+    }
+
+    // ===== GOOGLE (demo) =====
+    function handleGoogleLogin() {
+      const demoUser = {
+        name: "Người dùng Google",
+        email: `google_${Date.now()}@gmail.com`,
+        role: "user",
+        phone: "",
+        location: "",
+        avatar: "G",
+        joined: new Date().toLocaleDateString("vi-VN")
+      };
+      saveSession(demoUser);
+      showMsg("loginMsg", "✅ Đăng nhập Google thành công! Đang chuyển hướng...", "success");
+      setTimeout(() => window.location.href = "index.html", 1000);
+    }
+
+    // ===== UTILS =====
+    function togglePw(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === "password") { input.type = "text"; btn.textContent = "🙈"; }
+      else { input.type = "password"; btn.textContent = "👁"; }
+    }
+
+    function showMsg(id, msg, type) {
+      const el = document.getElementById(id);
+      el.textContent = msg;
+      el.className = "auth-msg " + type;
+      setTimeout(() => el.className = "auth-msg", 4000);
+    }
+
+    function checkStrength(pw) {
+      let score = 0;
+      if (pw.length >= 6) score++;
+      if (pw.length >= 10) score++;
+      if (/[A-Z]/.test(pw) || /[0-9]/.test(pw)) score++;
+      if (/[^A-Za-z0-9]/.test(pw)) score++;
+
+      const colors = ["","#E83030","#E8A620","#C9973B","#2D8A3E"];
+      const labels = ["","Yếu","Trung bình","Tốt","Mạnh"];
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`bar${i}`).style.background = i <= score ? colors[score] : "var(--light-gray)";
+      }
+      document.getElementById("pwLabel").textContent = pw ? labels[score] : "";
+      document.getElementById("pwLabel").style.color = colors[score];
+    }
+
+    // Init
+    getUsers(); // ensure admin seeded
+  </script>
+</body>
+</html>

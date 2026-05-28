@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAWGEN — Kết nối trái tim, cứu sống sinh linh</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-logo">
+      <span class="paw-icon">🐾</span>
+      <span class="logo-text">PAWGEN</span>
+    </div>
+    <div class="nav-links">
+      <a href="#hero" class="nav-link active" data-section="hero">Trang chủ</a>
+      <a href="#adopt" class="nav-link" data-section="adopt">Nhận nuôi</a>
+      <a href="#rescue" class="nav-link" data-section="rescue">Báo cứu hộ</a>
+      <a href="#foster" class="nav-link" data-section="foster">Nuôi tạm</a>
+      <a href="#volunteer" class="nav-link" data-section="volunteer">Tình nguyện</a>
+      <a href="#dashboard" class="nav-link" data-section="dashboard">Dashboard</a>
+      <a href="#donate" class="nav-link" data-section="donate">Donate</a>
+      <a href="#merch" class="nav-link" data-section="merch">Merch</a>
+    </div>
+    <button class="nav-cta" onclick="scrollToSection('rescue')">Báo cứu hộ ngay</button>
+    <div id="navAuth"></div>
+    <button class="hamburger" id="hamburger" aria-label="Menu">☰</button>
+  </nav>
+
+  <!-- MOBILE MENU -->
+  <div class="mobile-menu" id="mobileMenu">
+    <button class="mobile-close" id="mobileClose">✕</button>
+    <a href="#hero" class="mobile-link" onclick="closeMobileMenu()">Trang chủ</a>
+    <a href="#adopt" class="mobile-link" onclick="closeMobileMenu()">Nhận nuôi</a>
+    <a href="#rescue" class="mobile-link" onclick="closeMobileMenu()">Báo cứu hộ</a>
+    <a href="#foster" class="mobile-link" onclick="closeMobileMenu()">Nuôi tạm</a>
+    <a href="#volunteer" class="mobile-link" onclick="closeMobileMenu()">Tình nguyện</a>
+    <a href="#dashboard" class="mobile-link" onclick="closeMobileMenu()">Dashboard</a>
+    <a href="#donate" class="mobile-link" onclick="closeMobileMenu()">Donate</a>
+    <a href="#merch" class="mobile-link" onclick="closeMobileMenu()">Merch</a>
+  </div>
+
+  <!-- ===== HERO ===== -->
+  <section id="hero" class="section hero-section">
+    <div class="hero-bg-grid"></div>
+    <div class="floating-paws" id="floatingPaws"></div>
+    <div class="hero-content">
+      <div class="hero-badge">🐾 Nền tảng phi tập trung đầu tiên tại Việt Nam</div>
+      <h1 class="hero-title">
+        Mỗi sinh linh<br/>
+        <em>xứng đáng</em><br/>
+        được yêu thương.
+      </h1>
+      <p class="hero-sub">PAWGEN kết nối sinh viên — người cứu hộ — phòng khám — người nhận nuôi thành một hệ sinh thái hoàn chỉnh. Không cần shelter lớn. Chỉ cần một cộng đồng đủ tâm.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="scrollToSection('rescue')">🚨 Báo cứu hộ ngay</button>
+        <button class="btn-secondary" onclick="scrollToSection('adopt')">🐱 Tìm thú cưng</button>
+      </div>
+      <div class="hero-stats">
+        <div class="stat-item">
+          <span class="stat-num" data-target="342">0</span>
+          <span class="stat-label">Thú được cứu</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="128">0</span>
+          <span class="stat-label">Người nuôi tạm</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="57">0</span>
+          <span class="stat-label">Phòng khám đối tác</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-num" data-target="21">0</span>
+          <span class="stat-label">Trường đại học</span>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-card-stack">
+        <div class="pet-card hero-card-1">
+          <div class="pet-card-img">🐱</div>
+          <div class="pet-card-info">
+            <strong>Mochi</strong>
+            <span class="tag tag-safe">🟢 An toàn</span>
+          </div>
+        </div>
+        <div class="pet-card hero-card-2">
+          <div class="pet-card-img">🐶</div>
+          <div class="pet-card-info">
+            <strong>Bông</strong>
+            <span class="tag tag-urgent">🔴 Cần cứu gấp</span>
+          </div>
+        </div>
+        <div class="pet-card hero-card-3">
+          <div class="pet-card-img">🐱</div>
+          <div class="pet-card-info">
+            <strong>Pudding</strong>
+            <span class="tag tag-watch">🟡 Theo dõi</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== HOW IT WORKS ===== -->
+  <section id="how" class="section how-section">
+    <div class="section-header">
+      <div class="section-badge">Quy trình</div>
+      <h2 class="section-title">Từ phát hiện đến <em>mái ấm mới</em></h2>
+    </div>
+    <div class="flow-steps">
+      <div class="flow-step" data-step="1">
+        <div class="step-icon">📸</div>
+        <div class="step-body">
+          <h3>Phát hiện & Báo tin</h3>
+          <p>Chụp hình, đăng vị trí, mô tả tình trạng qua app trong 30 giây.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-step="2">
+        <div class="step-icon">🤖</div>
+        <div class="step-body">
+          <h3>AI đánh giá mức độ</h3>
+          <p>Hệ thống phân loại: 🔴 Khẩn cấp / 🟡 Theo dõi / 🟢 An toàn.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-step="3">
+        <div class="step-icon">🏠</div>
+        <div class="step-body">
+          <h3>Ghép người nuôi tạm</h3>
+          <p>Tự động tìm volunteer, shelter hoặc cộng đồng rescue gần nhất.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-step="4">
+        <div class="step-icon">💉</div>
+        <div class="step-body">
+          <h3>Điều trị thú y</h3>
+          <p>Kết nối phòng khám đối tác: khám, vaccine, triệt sản.</p>
+        </div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step" data-step="5">
+        <div class="step-icon">❤️</div>
+        <div class="step-body">
+          <h3>Tìm chủ mới</h3>
+          <p>Profile đầy đủ, ghép người nhận nuôi phù hợp. Adoption thành công!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== ADOPT ===== -->
+  <section id="adopt" class="section adopt-section">
+    <div class="section-header">
+      <div class="section-badge">Nhận nuôi</div>
+      <h2 class="section-title">Tìm người bạn <em>bốn chân</em> của bạn</h2>
+    </div>
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">Tất cả</button>
+      <button class="filter-btn" data-filter="cat">🐱 Mèo</button>
+      <button class="filter-btn" data-filter="dog">🐶 Chó</button>
+      <button class="filter-btn" data-filter="urgent">🔴 Cần gấp</button>
+      <button class="filter-btn" data-filter="vaccinated">💉 Đã vaccine</button>
+    </div>
+    <div class="pets-grid" id="petsGrid">
+      <!-- Injected by JS -->
+    </div>
+    <div class="section-cta">
+      <button class="btn-outline" onclick="showMorePets()">Xem thêm thú cưng →</button>
+    </div>
+  </section>
+
+  <!-- ===== RESCUE REPORT ===== -->
+  <section id="rescue" class="section rescue-section">
+    <div class="rescue-inner">
+      <div class="rescue-left">
+        <div class="section-badge">Báo cứu hộ</div>
+        <h2 class="section-title">Bạn thấy thú cưng bị bỏ rơi?</h2>
+        <p class="rescue-desc">Chỉ cần 1 phút báo tin, hệ thống sẽ xử lý toàn bộ còn lại. Báo cáo miễn phí, luôn luôn.</p>
+        <div class="rescue-features">
+          <div class="rescue-feat">✅ Miễn phí hoàn toàn</div>
+          <div class="rescue-feat">✅ Phản hồi trong 15 phút</div>
+          <div class="rescue-feat">✅ Theo dõi trạng thái real-time</div>
+          <div class="rescue-feat">✅ Kết nối volunteer gần nhất</div>
+        </div>
+      </div>
+      <div class="rescue-right">
+        <form class="rescue-form" id="rescueForm">
+          <div class="form-group">
+            <label>Vị trí phát hiện *</label>
+            <input type="text" id="rescueLocation" placeholder="VD: Cổng trường ĐH Bách Khoa, Q.10" required />
+          </div>
+          <div class="form-group">
+            <label>Loại động vật *</label>
+            <div class="radio-group">
+              <label class="radio-label"><input type="radio" name="rescueType" value="cat" /> 🐱 Mèo</label>
+              <label class="radio-label"><input type="radio" name="rescueType" value="dog" /> 🐶 Chó</label>
+              <label class="radio-label"><input type="radio" name="rescueType" value="other" /> 🐾 Khác</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Tình trạng *</label>
+            <select id="rescueCondition" required>
+              <option value="">Chọn tình trạng...</option>
+              <option value="urgent">🔴 Bị thương nặng, cần cứu ngay</option>
+              <option value="watch">🟡 Có vẻ ốm, cần theo dõi</option>
+              <option value="safe">🟢 Khỏe mạnh nhưng bị bỏ rơi</option>
+              <option value="unknown">⚪ Không chắc chắn</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Mô tả thêm</label>
+            <textarea id="rescueDesc" placeholder="Màu lông, kích thước, hành vi... mọi thông tin đều hữu ích!" rows="3"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Ảnh chụp (nếu có)</label>
+            <div class="upload-zone" id="uploadZone">
+              <span>📷 Nhấn để tải ảnh lên hoặc kéo thả</span>
+              <input type="file" accept="image/*" style="display:none" id="fileInput"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Số điện thoại liên hệ *</label>
+            <input type="tel" id="rescuePhone" placeholder="0xxx xxx xxx" required />
+          </div>
+          <button type="submit" class="btn-primary w-full">🚨 Gửi báo cáo cứu hộ</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== FOSTER ===== -->
+  <section id="foster" class="section foster-section">
+    <div class="section-header">
+      <div class="section-badge">Nuôi tạm</div>
+      <h2 class="section-title">Cho mượn một <em>mái ấm</em> nhỏ</h2>
+      <p class="section-sub">Bạn không cần nuôi mãi mãi — chỉ cần vài tuần đủ để thú cưng ổn định và tìm được chủ mới. PAWGEN hỗ trợ chi phí thú y và thức ăn.</p>
+    </div>
+    <div class="foster-grid">
+      <div class="foster-card">
+        <div class="foster-icon">💰</div>
+        <h3>Hỗ trợ chi phí</h3>
+        <p>PAWGEN hoàn tiền thức ăn, thú y trong thời gian nuôi tạm qua quỹ cộng đồng.</p>
+      </div>
+      <div class="foster-card">
+        <div class="foster-icon">📱</div>
+        <h3>Theo dõi dễ dàng</h3>
+        <p>Cập nhật tình trạng hàng ngày qua app. Đội ngũ hỗ trợ 24/7 khi cần.</p>
+      </div>
+      <div class="foster-card">
+        <div class="foster-icon">🏆</div>
+        <h3>Điểm tình nguyện</h3>
+        <p>Tích lũy điểm Foster Hero, đổi quà và được ưu tiên trong cộng đồng PAWGEN.</p>
+      </div>
+      <div class="foster-card">
+        <div class="foster-icon">🤝</div>
+        <h3>Không đơn độc</h3>
+        <p>Kết nối với cộng đồng 500+ foster đang hoạt động, chia sẻ kinh nghiệm.</p>
+      </div>
+    </div>
+    <div class="foster-cta">
+      <form class="foster-signup" id="fosterForm">
+        <h3>Đăng ký làm người nuôi tạm</h3>
+        <div class="foster-form-row">
+          <input type="text" id="fosterName" placeholder="Họ tên" required />
+          <input type="tel" id="fosterPhone" placeholder="Số điện thoại" required />
+          <input type="text" id="fosterArea" placeholder="Địa chỉ / Quận" required />
+          <select id="fosterType">
+            <option>Có thể nuôi: Mèo</option>
+            <option>Có thể nuôi: Chó</option>
+            <option>Có thể nuôi: Cả hai</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary">Đăng ký nuôi tạm →</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== VOLUNTEER ===== -->
+  <section id="volunteer" class="section volunteer-section">
+    <div class="section-header">
+      <div class="section-badge">Tình nguyện</div>
+      <h2 class="section-title">Tham gia <em>đội cứu hộ</em></h2>
+    </div>
+    <div class="volunteer-roles">
+      <div class="role-card" data-role="rescuer">
+        <div class="role-icon">🚑</div>
+        <h3>Rescuer</h3>
+        <p>Trực tiếp ra hiện trường bắt, vận chuyển động vật bị bỏ rơi đến nơi an toàn.</p>
+        <ul class="role-perks">
+          <li>Phụ cấp xăng xe</li>
+          <li>Chứng nhận tình nguyện</li>
+          <li>Ưu tiên nhận nuôi</li>
+        </ul>
+        <button class="btn-role" onclick="openVolunteerModal('Rescuer')">Đăng ký</button>
+      </div>
+      <div class="role-card featured" data-role="foster">
+        <div class="role-badge-top">Phổ biến nhất</div>
+        <div class="role-icon">🏠</div>
+        <h3>Foster Parent</h3>
+        <p>Nhận nuôi tạm tại nhà. Phù hợp với sinh viên, người đi làm có không gian.</p>
+        <ul class="role-perks">
+          <li>Hỗ trợ chi phí nuôi</li>
+          <li>Điểm Foster Hero</li>
+          <li>Cộng đồng hỗ trợ</li>
+        </ul>
+        <button class="btn-role" onclick="scrollToSection('foster')">Đăng ký</button>
+      </div>
+      <div class="role-card" data-role="photographer">
+        <div class="role-icon">📸</div>
+        <h3>Pet Photographer</h3>
+        <p>Chụp ảnh đẹp cho từng thú cưng để tăng khả năng được nhận nuôi.</p>
+        <ul class="role-perks">
+          <li>Portfolio tình nguyện</li>
+          <li>Gặp nhiều thú cute</li>
+          <li>Kỹ năng chụp ảnh pet</li>
+        </ul>
+        <button class="btn-role" onclick="openVolunteerModal('Photographer')">Đăng ký</button>
+      </div>
+      <div class="role-card" data-role="admin">
+        <div class="role-icon">💻</div>
+        <h3>Coordinator</h3>
+        <p>Điều phối online: quản lý case, liên hệ volunteer, cập nhật trạng thái.</p>
+        <ul class="role-perks">
+          <li>Làm việc remote</li>
+          <li>Kỹ năng quản lý</li>
+          <li>Chứng nhận NGO</li>
+        </ul>
+        <button class="btn-role" onclick="openVolunteerModal('Coordinator')">Đăng ký</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== DASHBOARD ===== -->
+  <section id="dashboard" class="section dashboard-section">
+    <div class="section-header">
+      <div class="section-badge">Dashboard</div>
+      <h2 class="section-title">Quản lý <em>cứu hộ</em> thời gian thực</h2>
+    </div>
+    <div class="dashboard-tabs">
+      <button class="dash-tab active" data-tab="overview">Tổng quan</button>
+      <button class="dash-tab" data-tab="cases">Cases đang xử lý</button>
+      <button class="dash-tab" data-tab="fosters">Danh sách Foster</button>
+      <button class="dash-tab" data-tab="campus">Bản đồ Campus</button>
+    </div>
+    <div class="dashboard-content" id="dashboardContent">
+      <!-- Injected by JS -->
+    </div>
+  </section>
+
+  <!-- ===== DONATE ===== -->
+  <section id="donate" class="section donate-section">
+    <div class="donate-inner">
+      <div class="donate-left">
+        <div class="section-badge">Donate</div>
+        <h2 class="section-title">Mỗi đồng donate <em>cứu một sinh mệnh</em></h2>
+        <p>100% quỹ donate được phân bổ trực tiếp cho từng case cứu hộ. Hoàn toàn minh bạch, có thể truy vết.</p>
+        <div class="donate-breakdown">
+          <div class="breakdown-item">
+            <span class="breakdown-color" style="background:#FF6B6B"></span>
+            <span>60% — Chi phí thú y (khám, vaccine, triệt sản)</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-color" style="background:#FFD93D"></span>
+            <span>25% — Thức ăn & vật dụng nuôi tạm</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-color" style="background:#6BCB77"></span>
+            <span>10% — Vận hành nền tảng</span>
+          </div>
+          <div class="breakdown-item">
+            <span class="breakdown-color" style="background:#4D96FF"></span>
+            <span>5% — Quỹ khẩn cấp</span>
+          </div>
+        </div>
+        <div class="donate-total">
+          <span class="donate-total-label">Tổng quỹ đã quyên góp:</span>
+          <span class="donate-total-num">47,230,000 VNĐ</span>
+        </div>
+      </div>
+      <div class="donate-right">
+        <div class="donate-card-selector">
+          <h3>Chọn mức donate</h3>
+          <div class="donate-amounts">
+            <button class="donate-amt" data-amt="2000">2K</button>
+            <button class="donate-amt" data-amt="5000">5K</button>
+            <button class="donate-amt active" data-amt="10000">10K</button>
+            <button class="donate-amt" data-amt="20000">20K</button>
+            <button class="donate-amt" data-amt="50000">50K</button>
+            
+            
+            
+            
+            
+            <input type="number" class="donate-custom" placeholder="Số khác..." id="customDonate"/>
+          </div>
+          <div class="donate-purpose">
+            <label>Donate cho:</label>
+            <select id="donatePurpose">
+              <option>🐾 Bất kỳ case cần nhất</option>
+              <option>🔴 Chỉ case khẩn cấp</option>
+              <option>💉 Quỹ thú y</option>
+              <option>🍚 Quỹ thức ăn</option>
+            </select>
+          </div>
+          <div class="donate-impact" id="donateImpact">
+            <span>✨ 50,000 VNĐ = 1 buổi khám thú y</span>
+          </div>
+          <button class="btn-donate" id="donateBtn">💝 Donate ngay</button>
+          <p class="donate-note">Thanh toán qua Momo, VNPay, chuyển khoản ngân hàng</p>
+        </div>
+        <div class="recent-donors">
+          <h4>Người donate gần đây</h4>
+          <div class="donor-list" id="donorList">
+            <!-- Injected by JS -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== MERCH ===== -->
+  <section id="merch" class="section merch-section">
+    <div class="section-header">
+      <div class="section-badge">Merch Shop</div>
+      <h2 class="section-title">Mua để <em>làm điều tốt</em></h2>
+      <p class="section-sub">30% doanh thu từ mỗi sản phẩm đi thẳng vào quỹ cứu hộ. Mặc đẹp, làm tốt.</p>
+    </div>
+    <div class="merch-filter">
+      <button class="filter-btn active" data-mfilter="all">Tất cả</button>
+      <button class="filter-btn" data-mfilter="apparel">👕 Áo quần</button>
+      <button class="filter-btn" data-mfilter="accessory">🎒 Phụ kiện</button>
+      <button class="filter-btn" data-mfilter="sticker">🎨 Sticker</button>
+      <button class="filter-btn" data-mfilter="homeware">🏠 Đồ nhà</button>
+    </div>
+    <div class="merch-grid" id="merchGrid">
+      <!-- Injected by JS -->
+    </div>
+    <div class="merch-cart-float" id="cartFloat" style="display:none">
+      <span>🛒 <span id="cartCount">0</span> sản phẩm</span>
+      <button onclick="openCart()">Xem giỏ hàng →</button>
+    </div>
+  </section>
+
+  <!-- ===== PARTNERS ===== -->
+  <section id="partners" class="section partners-section">
+    <div class="section-header">
+      <div class="section-badge">Đối tác</div>
+      <h2 class="section-title">Cùng nhau <em>tạo thay đổi</em></h2>
+    </div>
+    <div class="partner-categories">
+      <div class="partner-cat">
+        <h4>🏥 Phòng khám thú y</h4>
+        <div class="partner-logos">
+          <div class="partner-logo">PetCare Plus</div>
+          <div class="partner-logo">VetStar Clinic</div>
+          <div class="partner-logo">Happy Paws Vet</div>
+        </div>
+      </div>
+      <div class="partner-cat">
+        <h4>🎓 Trường đại học</h4>
+        <div class="partner-logos">
+          <div class="partner-logo">ĐH Bách Khoa</div>
+          <div class="partner-logo">ĐH KHTN</div>
+          <div class="partner-logo">ĐH Kinh tế</div>
+          <div class="partner-logo">ĐH Sư Phạm</div>
+        </div>
+      </div>
+      <div class="partner-cat">
+        <h4>🏢 Doanh nghiệp tài trợ</h4>
+        <div class="partner-logos">
+          <div class="partner-logo">PetMart VN</div>
+          <div class="partner-logo">Royal Canin</div>
+          <div class="partner-logo">Whiskas</div>
+        </div>
+      </div>
+    </div>
+    <div class="become-partner">
+      <p>Bạn muốn trở thành đối tác của PAWGEN?</p>
+      <button class="btn-outline" onclick="openPartnerModal()">Liên hệ hợp tác →</button>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo">🐾 PAWGEN</div>
+        <p>Nền tảng phi tập trung kết nối cứu hộ, nuôi tạm và nhận nuôi động vật bị bỏ rơi.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn">Facebook</a>
+          <a href="#" class="social-btn">Instagram</a>
+          <a href="#" class="social-btn">TikTok</a>
+          <a href="#" class="social-btn">Zalo</a>
+        </div>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h5>Dịch vụ</h5>
+          <a href="#rescue">Báo cứu hộ</a>
+          <a href="#adopt">Nhận nuôi</a>
+          <a href="#foster">Nuôi tạm</a>
+          <a href="#donate">Donate</a>
+        </div>
+        <div class="footer-col">
+          <h5>Cộng đồng</h5>
+          <a href="#volunteer">Tình nguyện</a>
+          <a href="#partners">Đối tác</a>
+          <a href="#merch">Merch Shop</a>
+          <a href="#dashboard">Dashboard</a>
+        </div>
+        <div class="footer-col">
+          <h5>Liên hệ</h5>
+          <a href="#">hello@pawgen.vn</a>
+          <a href="#">Hotline: 1800-PAW</a>
+          <a href="#">TP. Hồ Chí Minh</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 PAWGEN. Made with ❤️ for every stray soul.</span>
+      <span>30% doanh thu Merch → Quỹ cứu hộ</span>
+    </div>
+  </footer>
+
+  <!-- ===== MODALS ===== -->
+  <!-- Volunteer Modal -->
+  <div class="modal-overlay" id="volunteerModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('volunteerModal')">✕</button>
+      <h3>Đăng ký tình nguyện: <span id="volunteerRole"></span></h3>
+      <form id="volunteerForm">
+        <div class="form-group"><label>Họ tên *</label><input type="text" id="volName" required/></div>
+        <div class="form-group"><label>Email *</label><input type="email" id="volEmail" required/></div>
+        <div class="form-group"><label>Số điện thoại *</label><input type="tel" id="volPhone" required/></div>
+        <div class="form-group"><label>Quận / Khu vực</label><input type="text" id="volArea"/></div>
+        <div class="form-group"><label>Thời gian có thể</label>
+          <div class="checkbox-group">
+            <label><input type="checkbox" id="volTimeSang"/> Buổi sáng</label>
+            <label><input type="checkbox" id="volTimeChieu"/> Buổi chiều</label>
+            <label><input type="checkbox" id="volTimeToi"/> Buổi tối</label>
+            <label><input type="checkbox" id="volTimeCuoiTuan"/> Cuối tuần</label>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary w-full">Gửi đơn đăng ký</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Pet Detail Modal -->
+  <div class="modal-overlay" id="petModal">
+    <div class="modal modal-wide">
+      <button class="modal-close" onclick="closeModal('petModal')">✕</button>
+      <div id="petModalContent"></div>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div class="modal-overlay" id="cartModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal('cartModal')">✕</button>
+      <h3>🛒 Giỏ hàng của bạn</h3>
+      <div id="cartContent"></div>
+      <div class="cart-footer" id="cartFooter"></div>
+    </div>
+  </div>
+
+  <!-- Toast notification -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

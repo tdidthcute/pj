@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>PAWGEN Admin — Quản lý cứu hộ</title>
+  <link rel="stylesheet" href="admin.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <!-- LOGIN SCREEN -->
+  <div class="login-screen" id="loginScreen">
+    <div class="login-box">
+      <div class="login-logo">🐾 PAWGEN Admin</div>
+      <p class="login-sub">Đăng nhập để quản lý hệ thống cứu hộ</p>
+      <form id="loginForm">
+        <div class="lform-group">
+          <label>Tên đăng nhập</label>
+          <input type="text" id="loginUser" placeholder="admin" autocomplete="off"/>
+        </div>
+        <div class="lform-group">
+          <label>Mật khẩu</label>
+          <input type="password" id="loginPass" placeholder="••••••••"/>
+        </div>
+        <div class="login-hint">💡 Dùng: <strong>admin</strong> / <strong>pawgen123</strong></div>
+        <button type="submit" class="btn-login">Đăng nhập →</button>
+        <div class="login-error" id="loginError">Sai tên đăng nhập hoặc mật khẩu!</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ADMIN APP -->
+  <div class="admin-app" id="adminApp" style="display:none">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-logo">
+        <span>🐾</span>
+        <span>PAWGEN</span>
+        <span class="admin-chip">Admin</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Tổng quan</div>
+        <a class="sidebar-link active" data-page="overview">
+          <span class="sicon">📊</span> Dashboard
+        </a>
+
+        <div class="nav-section-label">Cứu hộ</div>
+        <a class="sidebar-link" data-page="pending">
+          <span class="sicon">⏳</span> Duyệt báo cáo
+          <span class="badge-count" id="pendingCount">0</span>
+        </a>
+        <a class="sidebar-link" data-page="approved">
+          <span class="sicon">✅</span> Đã duyệt
+        </a>
+        <a class="sidebar-link" data-page="rejected">
+          <span class="sicon">❌</span> Đã từ chối
+        </a>
+
+        <div class="nav-section-label">Quản lý</div>
+        <a class="sidebar-link" data-page="add">
+          <span class="sicon">➕</span> Thêm thú cưng
+        </a>
+        <a class="sidebar-link" data-page="fosters">
+          <span class="sicon">🏠</span> Người nuôi tạm
+        </a>
+        <a class="sidebar-link" data-page="merch">
+          <span class="sicon">🛍️</span> Quản lý Merch
+        </a>
+        <a class="sidebar-link" data-page="volunteers">
+          <span class="sicon">🙋</span> Tình nguyện viên
+        </a>
+      </nav>
+
+      <div class="sidebar-user">
+        <div class="sidebar-avatar">👤</div>
+        <div>
+          <div class="sidebar-username">Admin PAWGEN</div>
+          <div class="sidebar-role">Quản trị viên</div>
+        </div>
+        <button class="btn-logout" onclick="logout()" title="Đăng xuất">⏻</button>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="admin-main" id="adminMain">
+
+      <!-- TOP BAR -->
+      <header class="topbar">
+        <button class="sidebar-toggle" id="sidebarToggle">☰</button>
+        <div class="topbar-title" id="topbarTitle">Dashboard</div>
+        <div class="topbar-right">
+          <div class="notif-bell" onclick="showToast('🔔 Không có thông báo mới!')">
+            🔔 <span class="notif-dot"></span>
+          </div>
+          <a href="index.html" target="_blank" class="btn-view-site">Xem trang chủ →</a>
+        </div>
+      </header>
+
+      <!-- PAGE CONTENT -->
+      <div class="page-content" id="pageContent">
+        <!-- Injected by JS -->
+      </div>
+    </main>
+  </div>
+
+  <!-- DETAIL MODAL -->
+  <div class="modal-overlay" id="detailModal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
+  <script src="admin.js"></script>
+</body>
+</html>
